@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>PARSEL BULUCU</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bunları hep internetten çekiyor -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href=" https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+  <!-- Bunlarsız Olmaz -->
+
+
+
+  
+</head>
+<body>
+
+<div class="container-fluid">
+  <h2>EMRE PROJE</h2>
+  <p>Python&Django</p>
+  <div class="row">
+    <div class="col bg-success">
+      <hr>
+      
+      <form id="formparsel">{% csrf_token %}
+        <div class="form-row align-items-center">
+          <div class="row">
+          <div class="col-3">
+            <label class="sr-only" for="inlineFormInputGroup">MAX VALUE</label>
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">MAX</div>
+              </div>
+              <input type="number" class="form-control" id="maxvalue" placeholder="max value" required>
+            </div>
+          </div>
+          <div class="col-3">
+            <label class="sr-only" for="inlineFormInputGroup">MIN VALUE</label>
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">MIN</div>
+              </div>
+              <input type="number" class="form-control" id="minvalue" placeholder="min value" required>
+            </div>
+          </div>
+          
+          <div class="col-3">
+            
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Mesafe</div>
+            
+            
+                <input type="number" step="any" class="form-control" id="mesafe" placeholder="MAX Uzaklık Değeri" required>
+             
+         
+              </div>
+            </div>
+          
+          </div>
+          <div class="col-3">
+            <select  required  id="sehirsec" class="custom-select mb-2" id="inlineFormCustomSelectPref">
+              <option selected>Şehir Seçin</option>
+              <option value="1">Ankara</option>
+              <option value="2">İstanbul</option>
+              <option value="3">İzmir</option>
+              <option value="4">Bursa</option>
+              <option value="4">Çorum</option>
+            </select>
+            </div>
+          
+          
+        </div>
+          <div class="col-3">
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+          </div>
+        </div>
+      </div>
+      </form>
+      <hr>
+    </div>
+    <div class="col bg-info">
+      <div class=container>
+        <hr>
+        <div class="card-body ">
+          <table class="table table-hover" id="parselID" data-sort-name="bitisoncelik">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">ADA</th>
+                <th class="text-center"  scope="col">PARSEL</th>
+                <th class="text-center"  scope="col">MESAFE</th>
+              </tr>
+            </thead>
+            <tbody id="oncelikForm">
+          
+            </tbody>
+          </table>
+        </div> 
+    </div>
+  </div>
+  <hr>
+</div>
+<br>
+<!-- <hr>
+<div class="container">
+  <div class="row">
+    <div class="col-5">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Mesafe Bulucu</span>
+      </div>
+      <input type="number" class="form-control" placeholder="ADA Numarasını Girisiniz" onkeyup="MesafeBul(event,this)" aria-describedby="basic-addon1">
+    </div>
+  </div>
+  <div class="col-7">
+    <div class="container">
+      <div class="card-body ">
+        <table class="table table-hover" id="parselMesafe" data-sort-name="bitisoncelik">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">ADA</th>
+              <th class="text-center"  scope="col">MESAFE</th>
+            </tr>
+          </thead>
+          <tbody id="oncelikForm">
+        
+          </tbody>
+        </table>
+      </div> 
+
+
+
+  </div>
+</div>
+</div> -->
+</div>
+
+</body>
+</html>
+<script>
+
+
+
+// Fonksiyon
+$("#formparsel").submit(function(e) {
+ console.log(jQuery('#sehirsec').val())
+  if(jQuery('#sehirsec').val() == 'Şehir Seçin'){ 
+   alert('Lütfen Şehir Seçin'); 
+  }else{ 
+
+
+e.preventDefault(); 
+$.ajax({
+       type: "POST",
+       url: '/home',
+       data: {type:'parselbul',min:document.getElementById('minvalue').value,max:document.getElementById('maxvalue').value,mesafe:document.getElementById('mesafe').value,sehir:jQuery('#sehirsec').val()}, 
+       success: function(data)
+       {
+        //  ekrana bas gitsin
+        $('#parselID tbody tr').remove();
+        for (var i = 0; i < data.length; i++){  
+               console.log(data)
+               ada=data[i]['ada']
+               parsel=data[i]['parsel']
+               mesafe=data[i]['mesafe']
+                added_row =  
+                '<tr>'
+                  + '<td style="text-align:center">' + ada+  '</td>'
+                  + '<td style="text-align:center" >' + parsel+  '</td>'
+                  + '<td style="text-align:center" >' + mesafe+  '</td>'
+                 + '</tr>'
+              $('#parselID').append(added_row)
+                };
+                
+       },
+       error(err){
+            console.log;(err);
+            }
+     });
+
+    }
+});
+
+function MesafeBul(e,el){
+    console.log('tuşa basıldı ',e.keyCode)
+
+		if ( e.target.value) {
+            new Promise(function(resolve,reject){
+              let data = {
+              "type" : 'mesafebul',
+              "ada" : e.target.value
+              }
+              
+            $.ajax({
+                  type: "POST",
+                  url: '/home',
+                  data : data,
+                  success: function (resp){
+                    
+                    console.log(resp)
+                    
+                    if(resp['status'] == '200'){
+                      // ekrana bas gitsin
+                      $('#parselMesafe tbody tr').remove();
+                    for (var i = 0; i < resp['mesafe'].length; i++){  
+                          console.log(data)
+                          ada=resp['mesafe'][i]['parselid']
+                          mesafe=resp['mesafe'][i]['mesafe']
+                        
+                        
+
+                      
+
+                            added_row =  
+                            '<tr>'
+                              + '<td style="text-align:center">' + ada+  '</td>'
+                              + '<td style="text-align:center" >' +mesafe+  '</td>'
+                            + '</tr>'
+                          $('#parselMesafe').append(added_row)
+                            };
+
+                       
+                    }else if(resp['status'] == '400'){
+                      // Yoksa Ada hata mesajı
+                      toastr.warning("Böyle Bir Ada No Bulunamadı!");
+                   
+                     
+                    }
+                  },
+                    error(err){
+                      console.log(err);
+                      toastr.error("Sunucu Hatası");
+                      return;
+                    }
+              });
+          }).then(function(r){
+            // Belki olumlu sonuçlandıktan sonra tabloyu 20sn sonra temizlemek için promise kullandık
+            console.log(r)
+          })
+        }
+      }
+    
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
